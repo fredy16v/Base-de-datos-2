@@ -22,6 +22,15 @@ public class Startup
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
         });
         
+        //Add CORS
+        services.AddCors(options =>
+        {
+            options.AddPolicy("CorsRule", rule =>
+            {
+                rule.AllowAnyHeader().AllowAnyMethod().WithOrigins("*");
+            });
+        });// para permitir que se conecte el backend con el forntend
+        
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
     }
@@ -37,6 +46,8 @@ public class Startup
         app.UseHttpsRedirection();
 
         app.UseRouting();
+        
+        app.UseCors("CorsRule");
         
         app.UseAuthorization();
 

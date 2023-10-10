@@ -12,4 +12,6 @@ public class Autor
     [Required]
     [StringLength(70)]
     public string Name { get; set; }
+
+    public IEnumerable<Book> Books { get; set; }
 }
