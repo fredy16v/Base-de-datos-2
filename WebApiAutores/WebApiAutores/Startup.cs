@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 using WebApiAutores.Entities;
 
 namespace WebApiAutores;
@@ -14,7 +15,8 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler
+        = ReferenceHandler.IgnoreCycles);// para solucionar el error de entra en bucle el sql porque hay una relacion de muchos a muchos
         
         //Add DbContext
         services.AddDbContext<ApplicationDbContext>(options =>

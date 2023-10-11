@@ -13,5 +13,5 @@ public class Autor
     [StringLength(70)]
     public string Name { get; set; }
 
-    public IEnumerable<Book> Books { get; set; }
+    public virtual IEnumerable<Book> Books { get; set; }
 }
