@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiAutores.Entities;
@@ -22,9 +23,15 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Autor>> GetOneById(int id)
+        //[Authorize]
+        [ResponseCache(Duration = 10)]
+        public async Task<ActionResult<object>> GetOneById(int id)
         {
-            return await _context.Autores.FirstOrDefaultAsync(a => a.Id == id);
+            //return await _context.Autores.FirstOrDefaultAsync(a => a.Id == id);
+            var autor = await _context.Autores.FirstOrDefaultAsync(a => a.Id == id);
+            
+            return new {autor, number = new Random().Next(0, 100)};
+            
         }
         
         [HttpPost]

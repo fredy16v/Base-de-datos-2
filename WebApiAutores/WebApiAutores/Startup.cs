@@ -1,6 +1,8 @@
 ﻿using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using WebApiAutores.Entities;
+using WebApiAutores.Middlewares;
 
 namespace WebApiAutores;
 
@@ -24,8 +26,14 @@ public class Startup
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
         });
         
-        //Add CORS
-        services.AddCors(options =>
+        // Add cache filter
+        services.AddResponseCaching();
+
+		//Add JwtConfig
+		services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+
+		//Add CORS
+		services.AddCors(options =>
         {
             options.AddPolicy("CorsRule", rule =>
             {
@@ -37,8 +45,18 @@ public class Startup
         services.AddSwaggerGen();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
     {
+        /*app.Map("/semitas", app =>
+        {
+            app.Run(async contexto =>
+            {
+                await contexto.Response.WriteAsync("Interceptando la pipeline de procesos");
+            });
+        });*/
+        //middleware
+        app.UseLogginResponseHTTP();
+        
         if (env.IsDevelopment())
         {
             app.UseSwagger();
@@ -48,6 +66,8 @@ public class Startup
         app.UseHttpsRedirection();
 
         app.UseRouting();
+
+        app.UseResponseCaching();
         
         app.UseCors("CorsRule");
         

@@ -15,6 +15,12 @@ namespace WebApiAutores.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<List<Book>>> Get()
+        {
+            return await _context.Books.ToListAsync();
+        }
+
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<Book>> Get(Guid id)
         {
@@ -34,6 +40,40 @@ namespace WebApiAutores.Controllers
             _context.Books.Add(model);
             await _context.SaveChangesAsync();
             return Ok("Libro creado correctamente");
+        }
+        
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult> Put(Guid id, Book model)//actualizar un libro
+        {
+            var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == id);
+            if (book is null)
+            {
+                return NotFound($"No existe el libro con el id: {id}");
+            }
+            var autorExiste = await _context.Autores.AnyAsync(x => x.Id == model.AutorId);
+            if (!autorExiste)
+            {
+                return BadRequest($"No existe el autor: {model.AutorId}");// el $ para inyectar el valor de la variable
+            }
+            book.ISBN = model.ISBN;
+            book.Title = model.Title;
+            book.PublicationDate = model.PublicationDate;
+            book.AutorId = model.AutorId;
+            await _context.SaveChangesAsync();
+            return Ok($"Libro con el id: {id} actualizado correctamente");
+        }
+        
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult> Delete(Guid id)
+        {
+            var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == id);
+            if (book is null)
+            {
+                return NotFound($"No existe el libro con el id: {id}");
+            }
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+            return Ok($"Libro con el id: {id} eliminado correctamente");
         }
     }
 }
