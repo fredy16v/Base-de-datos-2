@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using WebApiAutores.Entities;
+using WebApiAutores.Filters;
 using WebApiAutores.Middlewares;
 
 namespace WebApiAutores;
@@ -17,7 +18,10 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler
+        services.AddControllers(options =>
+        {
+            options.Filters.Add(typeof(ExceptionFilter));//aplicamos a todos los controladores el filtro
+        }).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler
         = ReferenceHandler.IgnoreCycles);// para solucionar el error de entra en bucle el sql porque hay una relacion de muchos a muchos
         
         //Add DbContext
@@ -25,6 +29,9 @@ public class Startup
         {
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
         });
+
+        services.AddTransient<MiFiltro>();
+        services.AddAutoMapper(typeof(Startup));
         
         // Add cache filter
         services.AddResponseCaching();
@@ -39,6 +46,7 @@ public class Startup
             {
                 rule.AllowAnyHeader().AllowAnyMethod().WithOrigins("*");
             });
+            
         });// para permitir que se conecte el backend con el forntend
         
         services.AddEndpointsApiExplorer();

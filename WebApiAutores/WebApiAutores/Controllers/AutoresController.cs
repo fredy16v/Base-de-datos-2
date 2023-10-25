@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiAutores.Entities;
+using WebApiAutores.Filters;
 
 namespace WebApiAutores.Controllers
 {
@@ -24,11 +25,13 @@ namespace WebApiAutores.Controllers
 
         [HttpGet("{id:int}")]
         //[Authorize]
+        [ServiceFilter(typeof(MiFiltro))]
         [ResponseCache(Duration = 10)]
         public async Task<ActionResult<object>> GetOneById(int id)
         {
-            //return await _context.Autores.FirstOrDefaultAsync(a => a.Id == id);
-            var autor = await _context.Autores.FirstOrDefaultAsync(a => a.Id == id);
+			throw new System.Exception("Error de prueba");
+			//return await _context.Autores.FirstOrDefaultAsync(a => a.Id == id);
+			var autor = await _context.Autores.FirstOrDefaultAsync(a => a.Id == id);
             
             return new {autor, number = new Random().Next(0, 100)};
             

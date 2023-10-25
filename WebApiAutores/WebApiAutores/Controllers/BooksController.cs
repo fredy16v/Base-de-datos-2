@@ -1,5 +1,7 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApiAutores.Dtos;
 using WebApiAutores.Entities;
 
 namespace WebApiAutores.Controllers
@@ -9,10 +11,12 @@ namespace WebApiAutores.Controllers
     public class BooksController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        
-        public BooksController(ApplicationDbContext context)
+        private readonly IMapper _mapper;
+
+        public BooksController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -22,11 +26,15 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<Book>> Get(Guid id)
+        public async Task<ActionResult<BookDto>> Get(Guid id)
         {
-            return await _context.Books
+            var book = await _context.Books
                 .Include(b => b.Autor)//para que incluya el autor y se mire en la peticion es como el join de sql
                 .FirstOrDefaultAsync(x => x.Id == id);
+
+            var bookDto = _mapper.Map<BookDto>(book);
+
+            return bookDto;
         }
         
         [HttpPost]

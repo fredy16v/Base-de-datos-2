@@ -6,7 +6,7 @@ namespace WebApiAutores.Entities;
 [Table("autores")]
 public class Autor
 {
-    [Column("id")]
+    [Column("id")]  
     public int Id { get; set; }
     [Column("name")]
     [Required]
