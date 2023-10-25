@@ -20,13 +20,17 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Book>>> Get()
+        public async Task<ActionResult<IReadOnlyList<BookDto>>> Get()
         {
-            return await _context.Books.ToListAsync();
+            var booksDb = await _context.Books.Include(b => b.Autor).ToListAsync();
+            
+            var booksDto = _mapper.Map<List<BookDto>>(booksDb);
+
+            return booksDto;
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<BookDto>> Get(Guid id)
+        public async Task<ActionResult<BookDto>> GetById(Guid id)
         {
             var book = await _context.Books
                 .Include(b => b.Autor)//para que incluya el autor y se mire en la peticion es como el join de sql
@@ -38,35 +42,43 @@ namespace WebApiAutores.Controllers
         }
         
         [HttpPost]
-        public async Task<ActionResult> Post(Book model)//crear un libro
+        public async Task<ActionResult> Post(BookCreateDto dto)//crear un libro
         {
-            var autorExiste = await _context.Autores.AnyAsync(x => x.Id == model.AutorId);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Los datos del libro son incorrectos");
+            }
+            var autorExiste = await _context.Autores.AnyAsync(x => x.Id == dto.AutorId);
             if (!autorExiste)
             {
-                return BadRequest($"No existe el autor: {model.AutorId}");// el $ para inyectar el valor de la variable
+                return BadRequest($"No existe el autor: {dto.AutorId}");// el $ para inyectar el valor de la variable
             }
-            _context.Books.Add(model);
+
+            var book = _mapper.Map<Book>(dto);
+            
+            _context.Books.Add(book);
             await _context.SaveChangesAsync();
             return Ok("Libro creado correctamente");
         }
         
-        [HttpPut("{id:guid}")]
-        public async Task<ActionResult> Put(Guid id, Book model)//actualizar un libro
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(Guid id, BookUpdateDto dto)//actualizar un libro
         {
-            var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == id);
-            if (book is null)
+            var bookDb = await _context.Books.FirstOrDefaultAsync(x => x.Id == id);
+            if (bookDb is null)
             {
                 return NotFound($"No existe el libro con el id: {id}");
             }
-            var autorExiste = await _context.Autores.AnyAsync(x => x.Id == model.AutorId);
+            
+            var autorExiste = await _context.Autores.AnyAsync(x => x.Id == dto.AutorId);
             if (!autorExiste)
             {
-                return BadRequest($"No existe el autor: {model.AutorId}");// el $ para inyectar el valor de la variable
+                return BadRequest($"No existe el autor: {dto.AutorId}");// el $ para inyectar el valor de la variable
             }
-            book.ISBN = model.ISBN;
-            book.Title = model.Title;
-            book.PublicationDate = model.PublicationDate;
-            book.AutorId = model.AutorId;
+
+            _mapper.Map<BookUpdateDto, Book>(dto, bookDb);
+            
+            _context.Update(bookDb);
             await _context.SaveChangesAsync();
             return Ok($"Libro con el id: {id} actualizado correctamente");
         }

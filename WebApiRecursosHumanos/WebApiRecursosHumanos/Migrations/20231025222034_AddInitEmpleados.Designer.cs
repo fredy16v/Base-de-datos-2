@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiRecursosHumanos.Entities;
 
@@ -10,10 +11,12 @@ using WebApiRecursosHumanos.Entities;
 
 namespace WebApiRecursosHumanos.Migrations
 {
-    [DbContext(typeof(RecursosHumanosContext))]
-    partial class RecursosHumanosContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ApplicationDbContextRecursosHumanos))]
+    [Migration("20231025222034_AddInitEmpleados")]
+    partial class AddInitEmpleados
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,71 +65,15 @@ namespace WebApiRecursosHumanos.Migrations
                         .HasColumnType("int")
                         .HasColumnName("numero_telefono");
 
-                    b.Property<string>("Profecion")
+                    b.Property<string>("Profesion")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
-                        .HasColumnName("profecion");
-
-                    b.Property<int>("ProyectoId")
-                        .HasColumnType("int")
-                        .HasColumnName("proyecto_id");
+                        .HasColumnName("profesion");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProyectoId");
 
                     b.ToTable("empleados");
-                });
-
-            modelBuilder.Entity("WebApiRecursosHumanos.Entities.Proyecto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("descripcion");
-
-                    b.Property<DateTime>("FechaFin")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("fecha_fin");
-
-                    b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("fecha_inicio");
-
-                    b.Property<string>("NombreProyecto")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("nombre_proyecto");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("proyectos");
-                });
-
-            modelBuilder.Entity("WebApiRecursosHumanos.Entities.Empleado", b =>
-                {
-                    b.HasOne("WebApiRecursosHumanos.Entities.Proyecto", "Proyecto")
-                        .WithMany("Empleados")
-                        .HasForeignKey("ProyectoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Proyecto");
-                });
-
-            modelBuilder.Entity("WebApiRecursosHumanos.Entities.Proyecto", b =>
-                {
-                    b.Navigation("Empleados");
                 });
 #pragma warning restore 612, 618
         }

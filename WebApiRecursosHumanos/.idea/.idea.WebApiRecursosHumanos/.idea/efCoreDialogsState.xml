@@ -3,7 +3,7 @@
   <component name="EfCoreDialogsState">
     <option name="keyValueStorage">
       <map>
-        <entry key="Common:1b80ba1e-abf8-4f0a-b12d-eed7017b7aef:dbContext" value="WebApiRecursosHumanos.Entities.RecursosHumanosContext" />
+        <entry key="Common:1b80ba1e-abf8-4f0a-b12d-eed7017b7aef:dbContext" value="WebApiRecursosHumanos.Entities.ApplicationDbContextProyectos" />
         <entry key="Common:buildConfiguration" value="Debug" />
         <entry key="Common:noBuild" value="false" />
         <entry key="Common:outputFolder" value="Migrations" />

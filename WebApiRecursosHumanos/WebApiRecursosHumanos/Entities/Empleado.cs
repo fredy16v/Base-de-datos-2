@@ -23,8 +23,8 @@ public class Empleado
     public DateTime FechaContratacion { get; set; }
     [Required]
     [MaxLength(50)]
-    [Column("profecion")]
-    public string Profecion { get; set; }
+    [Column("profesion")]
+    public string Profesion { get; set; }
     [Required]
     [MaxLength(100)]
     [Column("direccion")]
@@ -36,12 +36,4 @@ public class Empleado
     [Required]
     [Column("numero_telefono")]
     public int NumeroTelefono { get; set; }
-
-    // otras propiedades según sea necesario
-
-    // Relaciones
-    [Column("proyecto_id")]
-    public int ProyectoId { get; set; }
-    [ForeignKey(nameof(ProyectoId))]
-    public virtual Proyecto Proyecto { get; set; }
 }

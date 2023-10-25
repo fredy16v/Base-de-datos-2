@@ -6,7 +6,6 @@ namespace WebApiRecursosHumanos.Entities;
 [Table("proyectos")]
 public class Proyecto
 {
-    [Key]
     [Column("id")]
     public int Id { get; set; }
     [Required]
@@ -25,9 +24,6 @@ public class Proyecto
     [DataType(DataType.Date)]
     [Column("fecha_fin")]
     public DateTime FechaFin { get; set; }
-
-    // otras propiedades según sea necesario
-
-    // Relaciones
-    public virtual IEnumerable<Empleado> Empleados { get; set; }
+    
+    public virtual ICollection<ProyectoEmpleado>? ProyectoEmpleados { get; set; }
 }

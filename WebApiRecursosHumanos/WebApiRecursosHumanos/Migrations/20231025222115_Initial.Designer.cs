@@ -11,9 +11,9 @@ using WebApiRecursosHumanos.Entities;
 
 namespace WebApiRecursosHumanos.Migrations
 {
-    [DbContext(typeof(ProyectosContext))]
-    [Migration("20231025014224_InitProyectos")]
-    partial class InitProyectos
+    [DbContext(typeof(ApplicationDbContextProyectos))]
+    [Migration("20231025222115_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,19 +65,13 @@ namespace WebApiRecursosHumanos.Migrations
                         .HasColumnType("int")
                         .HasColumnName("numero_telefono");
 
-                    b.Property<string>("Profecion")
+                    b.Property<string>("Profesion")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
-                        .HasColumnName("profecion");
-
-                    b.Property<int>("ProyectoId")
-                        .HasColumnType("int")
-                        .HasColumnName("proyecto_id");
+                        .HasColumnName("profesion");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProyectoId");
 
                     b.ToTable("empleados");
                 });
@@ -116,20 +110,53 @@ namespace WebApiRecursosHumanos.Migrations
                     b.ToTable("proyectos");
                 });
 
-            modelBuilder.Entity("WebApiRecursosHumanos.Entities.Empleado", b =>
+            modelBuilder.Entity("WebApiRecursosHumanos.Entities.ProyectoEmpleado", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("EmpleadoId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProyectoId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpleadoId");
+
+                    b.HasIndex("ProyectoId");
+
+                    b.ToTable("ProyectoEmpleados");
+                });
+
+            modelBuilder.Entity("WebApiRecursosHumanos.Entities.ProyectoEmpleado", b =>
+                {
+                    b.HasOne("WebApiRecursosHumanos.Entities.Empleado", "Empleado")
+                        .WithMany()
+                        .HasForeignKey("EmpleadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WebApiRecursosHumanos.Entities.Proyecto", "Proyecto")
-                        .WithMany("Empleados")
+                        .WithMany("ProyectoEmpleados")
                         .HasForeignKey("ProyectoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Empleado");
 
                     b.Navigation("Proyecto");
                 });
 
             modelBuilder.Entity("WebApiRecursosHumanos.Entities.Proyecto", b =>
                 {
-                    b.Navigation("Empleados");
+                    b.Navigation("ProyectoEmpleados");
                 });
 #pragma warning restore 612, 618
         }

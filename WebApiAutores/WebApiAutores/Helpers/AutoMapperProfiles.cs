@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using WebApiAutores.Dtos;
 using WebApiAutores.Entities;
 
@@ -13,6 +14,9 @@ public class AutoMapperProfiles : Profile
 
     void MapsForBooks()
     {
-        CreateMap<BookDto, Book>().ReverseMap();
+        //CreateMap<BookDto, Book>().ReverseMap();
+        CreateMap<Book, BookDto>().ForPath(dest => dest.AutorNombre, opt => opt.MapFrom(src => src.Autor.Name));
+        
+        CreateMap<BookCreateDto, Book>();
     }
 }
