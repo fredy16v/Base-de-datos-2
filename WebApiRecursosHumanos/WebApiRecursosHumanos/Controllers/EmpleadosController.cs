@@ -40,7 +40,6 @@ namespace WebApiRecursosHumanos.Controllers
         public async Task<ActionResult> Post(Empleado modelo)
         {
             _contextProyectos.Add(modelo);
-            //await _contextProyectos.SaveChangesAsync();
             
             _context.Add(modelo);
             await _context.SaveChangesAsync();

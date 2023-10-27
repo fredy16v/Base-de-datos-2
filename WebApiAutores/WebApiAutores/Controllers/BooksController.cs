@@ -86,14 +86,14 @@ namespace WebApiAutores.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == id);
-            if (book is null)
+            var bookExist = await _context.Books.AnyAsync(x => x.Id == id);
+            if (!bookExist)
             {
                 return NotFound($"No existe el libro con el id: {id}");
             }
-            _context.Books.Remove(book);
+            _context.Remove(new Book() {Id = id});
             await _context.SaveChangesAsync();
-            return Ok($"Libro con el id: {id} eliminado correctamente");
+            return Ok(new {msg = $"Libro con el id: {id} se elimino correctamente"});
         }
     }
 }

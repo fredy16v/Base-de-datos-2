@@ -1,6 +1,8 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApiAutores.Dtos.Autores;
 using WebApiAutores.Entities;
 using WebApiAutores.Filters;
 
@@ -11,30 +13,35 @@ namespace WebApiAutores.Controllers
     public class AutoresController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public AutoresController(ApplicationDbContext context)
+        public AutoresController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         
         [HttpGet]
-        public async Task<ActionResult<List<Autor>>> Get()
+        public async Task<ActionResult<IReadOnlyList<AutorDto>>> Get()
         {
-            return await _context.Autores.ToListAsync();
+            var autoresDb = await _context.Autores.ToListAsync();
+            var autoresDto = _mapper.Map<List<AutorDto>>(autoresDb);
+            return autoresDto;
         }
 
         [HttpGet("{id:int}")]
-        //[Authorize]
-        [ServiceFilter(typeof(MiFiltro))]
-        [ResponseCache(Duration = 10)]
-        public async Task<ActionResult<object>> GetOneById(int id)
+        public async Task<ActionResult<AutorGetByIdDto>> GetOneById(int id)
         {
-			throw new System.Exception("Error de prueba");
-			//return await _context.Autores.FirstOrDefaultAsync(a => a.Id == id);
-			var autor = await _context.Autores.FirstOrDefaultAsync(a => a.Id == id);
+			var autorDb = await _context.Autores.Include(a => a.Books).FirstOrDefaultAsync(a => a.Id == id);
             
-            return new {autor, number = new Random().Next(0, 100)};
+            if (autorDb is null)
+            {
+                return NotFound();
+            }
             
+            var autorDto = _mapper.Map<AutorGetByIdDto>(autorDb);
+            
+            return autorDto;
         }
         
         [HttpPost]

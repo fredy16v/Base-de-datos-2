@@ -21,7 +21,6 @@ namespace WebApiRecursosHumanos.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Proyecto>>> Get()
         {
-            //retornar todos los proyectos y los empleados que estan en cada proyecto con los nombres de esos empleados
             return await _context.Proyectos.Include(p => p.ProyectoEmpleados).ThenInclude(pe => pe.Empleado)
                 .ToListAsync();
         }
