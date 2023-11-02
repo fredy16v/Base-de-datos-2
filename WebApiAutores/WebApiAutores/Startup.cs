@@ -37,7 +37,6 @@ public class Startup
         services.AddResponseCaching();
 
 		//Add JwtConfig
-		services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
 
 		//Add CORS
 		services.AddCors(options =>
@@ -65,11 +64,11 @@ public class Startup
         //middleware
         app.UseLogginResponseHTTP();
         
-        if (env.IsDevelopment())
-        {
+        //if (env.IsDevelopment())
+        //{
             app.UseSwagger();
             app.UseSwaggerUI();
-        }
+        //}
 
         app.UseHttpsRedirection();
 

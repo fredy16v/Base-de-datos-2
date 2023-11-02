@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApiAutores.Entities;
 
-[Table("books")]
+[Table("books", Schema = "transacctional")]
 public class Book
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]// para especificar que sea una PK y que si se genere el GUID
