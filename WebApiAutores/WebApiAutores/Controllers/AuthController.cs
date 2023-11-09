@@ -1,0 +1,98 @@
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using WebApiAutores.Dtos;
+using WebApiAutores.Dtos.Auth;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
+
+namespace WebApiAutores.Controllers
+{
+    [Route("api/auth")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IConfiguration _configuration;
+
+        public AuthController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager,
+            IConfiguration configuration)
+        {
+            _signInManager = signInManager;
+            _userManager = userManager;
+            _configuration = configuration;
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<ResponseDto<LoginResponseDto>>> Login(LoginDto dto)
+        {
+            var result = await _signInManager
+                .PasswordSignInAsync(dto.Email, dto.Password, isPersistent: false, lockoutOnFailure: false);
+
+            if (result.Succeeded)
+            {
+                var user = await _userManager.FindByEmailAsync(dto.Email);
+                
+                //generar el token de autenticacion
+                //Crear claims
+                var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),//para que sea unico
+                    new Claim("UserId", user.Id)
+                };
+                
+                var userRoles = await _userManager.GetRolesAsync(user);
+                foreach (var role in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, role));//para agregar los roles
+                }
+                //Generar el token
+                var jwtToken = GetToken(authClaims);
+                
+                var loginResponseDto = new LoginResponseDto
+                {
+                    Email = user.Email,
+                    FullName = "",
+                    TokenExpiration = jwtToken.ValidTo,
+                    Token = new JwtSecurityTokenHandler().WriteToken(jwtToken)//para que tradusca el token a string
+                };
+                return Ok(new ResponseDto<LoginResponseDto>
+                {
+                    Status = true,
+                    Message = "Login exitoso",
+                    Data = loginResponseDto
+                });
+            }
+
+            return StatusCode(StatusCodes.Status401Unauthorized, new ResponseDto<LoginResponseDto>
+            {
+                Status = false,
+                Message = "La autenticacion ha fallado"
+            });
+        }
+        
+        private JwtSecurityToken GetToken(List<Claim> authClaims)
+        {
+            var authSigninKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));// verificar la integridad del token
+            
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(1),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigninKey, SecurityAlgorithms.HmacSha256)
+            );// crear el token
+            
+            return token;
+        }
+    }
+}

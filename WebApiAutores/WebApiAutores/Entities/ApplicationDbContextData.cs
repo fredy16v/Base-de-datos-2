@@ -24,7 +24,7 @@ public static class ApplicationDbContextData
                     UserName = "jperez",
                     Email = "jperez@me.com"
                 };
-                await userManager.CreateAsync(userAdmin, "vasquezmiranda");
+                await userManager.CreateAsync(userAdmin, "Temporal01#");
                 await userManager.AddToRoleAsync(userAdmin, "Admin");
                 
                 var normalUser = new IdentityUser
@@ -32,7 +32,7 @@ public static class ApplicationDbContextData
                     UserName = "pepito@me.com",
                     Email = "pepito@me.com"
                 };
-                await userManager.CreateAsync(normalUser, "vasquezmiranda");
+                await userManager.CreateAsync(normalUser, "Temporal01#");
                 await userManager.AddToRoleAsync(normalUser, "User");
             }
         }
