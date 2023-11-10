@@ -79,6 +79,39 @@ namespace WebApiAutores.Controllers
                 Message = "La autenticacion ha fallado"
             });
         }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<ResponseDto<object>>> RegisterUser(RegisterUserDto dto)
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user is not null)
+            {
+                return BadRequest(new ResponseDto<object>
+                {
+                    Status = false,
+                    Message = $"El usuario con el correo {dto.Email} ya existe"
+                });
+            }
+
+            var identityUser = new IdentityUser
+            {
+                Email = dto.Email,
+                UserName = dto.Email
+            };
+
+            var result = await _userManager.CreateAsync(identityUser, dto.Password);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new ResponseDto<object>
+                {
+                    Status = false,
+                    Message = "No se pudo crear el usuario",
+                    Data = result.Errors
+                });
+            }
+            
+            return null;
+        }
         
         private JwtSecurityToken GetToken(List<Claim> authClaims)
         {

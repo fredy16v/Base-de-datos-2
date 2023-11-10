@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiAutores.Dtos;
@@ -8,6 +9,7 @@ namespace WebApiAutores.Controllers
 {
     [Route("api/books")]
     [ApiController]
+    [Authorize]//para que pida autenticacion
     public class BooksController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -20,6 +22,7 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<ResponseDto<IReadOnlyList<BookDto>>>> Get()
         {
             var booksDb = await _context.Books.Include(b => b.Autor).ToListAsync();
@@ -34,6 +37,7 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [AllowAnonymous]// para que no pida autenticacion
         public async Task<ActionResult<ResponseDto<BookDto>>> GetById(Guid id)
         {
             var bookDb = await _context.Books
