@@ -110,7 +110,11 @@ namespace WebApiAutores.Controllers
                 });
             }
             
-            return null;
+            return Ok(new ResponseDto<object>
+            {
+                Status = true,
+                Message = $"{dto.Email} registrado correctamente"
+            });
         }
         
         private JwtSecurityToken GetToken(List<Claim> authClaims)
