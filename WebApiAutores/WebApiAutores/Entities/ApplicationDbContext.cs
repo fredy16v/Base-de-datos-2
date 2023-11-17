@@ -32,4 +32,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<Autor> Autores { get; set; }
     public DbSet<Book> Books { get; set; }
+    public DbSet<Review> Reviews { get; set; }
+    public DbSet<Respuesta> Respuestas { get; set; }
+    
 }

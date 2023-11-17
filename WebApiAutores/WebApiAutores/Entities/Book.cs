@@ -24,4 +24,8 @@ public class Book
     public int AutorId { get; set; }
     [ForeignKey(nameof(AutorId))]
     public virtual Autor Autor { get; set; }
+    [Column("valoracion")]
+    public double? ValoracionPromedio { get; set; }
+    
+    public ICollection<Review> Reviews { get; set; }
 }

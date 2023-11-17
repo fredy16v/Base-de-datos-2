@@ -8,5 +8,4 @@ public class EmailConfigurationDto
     public string SmtpPassword { get; set; }
     public string FromName { get; set; }
     public string FromAddress { get; set; }
-    
 }

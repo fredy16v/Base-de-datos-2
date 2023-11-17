@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using WebApiAutores.Dtos;
 using WebApiAutores.Dtos.Auth;
+using WebApiAutores.Helpers;
+using WebApiAutores.Services;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace WebApiAutores.Controllers
@@ -22,13 +24,15 @@ namespace WebApiAutores.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IEmailSenderService _emailSenderService;
 
         public AuthController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager,
-            IConfiguration configuration)
+            IConfiguration configuration, IEmailSenderService emailSenderService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _configuration = configuration;
+            _emailSenderService = emailSenderService;
         }
 
         [HttpPost("login")]
@@ -65,6 +69,9 @@ namespace WebApiAutores.Controllers
                     TokenExpiration = jwtToken.ValidTo,
                     Token = new JwtSecurityTokenHandler().WriteToken(jwtToken)//para que tradusca el token a string
                 };
+
+                await _emailSenderService.SendEmailAsync(user.Email, "WebApiAutores - Inicio de sesion", EmailTemplates.LoginTemplate(user.Email));
+                
                 return Ok(new ResponseDto<LoginResponseDto>
                 {
                     Status = true,

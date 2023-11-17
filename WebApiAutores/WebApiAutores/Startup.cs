@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using WebApiAutores.Entities;
 using WebApiAutores.Filters;
 using WebApiAutores.Middlewares;
+using WebApiAutores.Services;
 
 namespace WebApiAutores;
 
@@ -34,7 +35,10 @@ public class Startup
         });
 
         services.AddTransient<MiFiltro>();
+        //services.AddTransient<FiltroLenguajeOfencivo>();
+        services.AddTransient<IEmailSenderService, EmailSenderService>();
         services.AddAutoMapper(typeof(Startup));
+        services.AddHttpContextAccessor();
         
         //Add Identity
         services.AddIdentity<IdentityUser, IdentityRole>(options =>

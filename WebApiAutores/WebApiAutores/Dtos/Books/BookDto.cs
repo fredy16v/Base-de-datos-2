@@ -8,4 +8,5 @@ public class BookDto
     public DateTime PublicationDate { get; set; }
     public int AutorId { get; set; }
     public string AutorNombre { get; set; }
+    public double? ValoracionPromedio { get; set; }
 }

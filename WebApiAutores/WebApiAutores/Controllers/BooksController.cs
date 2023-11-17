@@ -28,6 +28,15 @@ namespace WebApiAutores.Controllers
             var booksDb = await _context.Books.Include(b => b.Autor).ToListAsync();
             
             var booksDto = _mapper.Map<List<BookDto>>(booksDb);
+            
+            foreach (var bookDto in booksDto)//valoraciones
+            {
+                   var reviews = await _context.Reviews.Where(x => x.BookId == bookDto.Id).ToListAsync();
+                    if (reviews.Any())
+                    {
+                        bookDto.ValoracionPromedio = reviews.Average(x => x.Valoracion);
+                    }
+            }
 
             return Ok(new ResponseDto<IReadOnlyList<BookDto>>
             {
@@ -53,6 +62,12 @@ namespace WebApiAutores.Controllers
             }
 
             var bookDto = _mapper.Map<BookDto>(bookDb);
+            
+            var reviews = await _context.Reviews.Where(x => x.BookId == bookDto.Id).ToListAsync();//valoraciones
+            if (reviews.Any())
+            {
+                bookDto.ValoracionPromedio = reviews.Average(x => x.Valoracion);
+            }
 
             return Ok(new ResponseDto<BookDto>
             {
@@ -64,11 +79,6 @@ namespace WebApiAutores.Controllers
         [HttpPost]
         public async Task<ActionResult<ResponseDto<BookDto>>> Post(BookCreateDto dto)//crear un libro
         {
-            /*if (!ModelState.IsValid)
-            {
-                return BadRequest("Los datos del libro son incorrectos");
-            }*/ //ya no porque tenemos un middleware que lo hace por nosotros
-            
             var autorExiste = await _context.Autores.AnyAsync(x => x.Id == dto.AutorId);
             if (!autorExiste)
             {
